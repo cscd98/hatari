@@ -301,6 +301,10 @@ if(ENABLE_LIBRETRO)
 			$<TARGET_OBJECTS:UaeCpu>
 			$<TARGET_OBJECTS:Debug>
 			$<TARGET_OBJECTS:UiRetro>)
+	set_target_properties(retro-hatari PROPERTIES
+		PREFIX ""
+		OUTPUT_NAME "hatari_libretro"
+	)
 endif(ENABLE_LIBRETRO)
 
 target_link_libraries(${APP_NAME} ${SDL2_LIBRARIES})
