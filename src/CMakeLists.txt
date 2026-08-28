@@ -141,6 +141,16 @@ add_library(CoreHmsa OBJECT ${SOURCES_HMSA})
 if(ENABLE_LIBRETRO)
 	set_target_properties(Core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 	set_target_properties(CoreHmsa PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+
+	# Separate object files compiled with -DLIBRETRO so that
+	# file.c has access to src/retro/vfs.c.
+	add_library(CoreRetro OBJECT ${SOURCES})
+	add_library(CoreHmsaRetro OBJECT ${SOURCES_HMSA})
+	target_compile_definitions(CoreRetro PRIVATE LIBRETRO)
+	target_compile_definitions(CoreHmsaRetro PRIVATE LIBRETRO)
+	set_target_properties(CoreRetro PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+	set_target_properties(CoreHmsaRetro PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+
 	add_subdirectory(retro)
 endif(ENABLE_LIBRETRO)
 
@@ -295,8 +305,8 @@ endif(SDL2_OTHER_CFLAGS)
 
 if(ENABLE_LIBRETRO)
 	add_library(retro-hatari MODULE
-			$<TARGET_OBJECTS:Core>
-			$<TARGET_OBJECTS:CoreHmsa>
+			$<TARGET_OBJECTS:CoreRetro>
+			$<TARGET_OBJECTS:CoreHmsaRetro>
 			$<TARGET_OBJECTS:Falcon>
 			$<TARGET_OBJECTS:UaeCpu>
 			$<TARGET_OBJECTS:Debug>

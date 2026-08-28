@@ -17,6 +17,7 @@
 #include "tos.h"
 #include "vdi.h"
 #include "version.h"
+#include "vfs.h"
 
 static bool has_cpu_config_changed = true;
 const char *retro_system_directory;
@@ -39,6 +40,9 @@ RETRO_API void retro_set_environment(retro_environment_t cb)
 
 	/* Hatari can start without game disks */
 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_game);
+
+	/* Retrieve VFS interface v4 or fall back if not available */
+	VFS_Init();
 }
 
 RETRO_API void retro_set_video_refresh(retro_video_refresh_t cb)
