@@ -11,6 +11,7 @@
 #include "dialog.h"
 #include "floppy.h"
 #include "m68000.h"
+#include "options.h"
 #include "reset.h"
 #include "screen.h"
 #include "sound.h"
@@ -19,7 +20,7 @@
 #include "version.h"
 #include "vfs.h"
 
-static bool has_cpu_config_changed = true;
+bool has_cpu_config_changed = true;
 const char *retro_system_directory;
 
 retro_environment_t environment_cb;
@@ -32,6 +33,7 @@ RETRO_API void retro_set_environment(retro_environment_t cb)
 {
 	static enum retro_pixel_format pixelformat = RETRO_PIXEL_FORMAT_XRGB8888;
 	static bool no_game = true;
+	bool categories_supported = false;
 
 	environment_cb = cb;
 
@@ -40,6 +42,9 @@ RETRO_API void retro_set_environment(retro_environment_t cb)
 
 	/* Hatari can start without game disks */
 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_game);
+
+	/* Register core options */
+	libretro_set_core_options(cb, &categories_supported);
 
 	/* Retrieve VFS interface v4 or fall back if not available */
 	VFS_Init();
@@ -93,6 +98,10 @@ RETRO_API void retro_init(void)
 	argv[0] = name;
 	argv[1] = NULL;
 	Main_Init(1, (char **)argv);
+
+	/* Apply core options on top of defaults/loaded config */
+	Core_ApplyBootOptions();
+	Core_ApplyRuntimeOptions();
 }
 
 RETRO_API void retro_deinit(void)
@@ -134,6 +143,15 @@ RETRO_API void retro_reset(void)
 
 RETRO_API void retro_run(void)
 {
+	bool options_updated = false;
+
+	if (environment_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &options_updated) &&
+	    options_updated)
+	{
+		/* re-apply updatable options */
+		Core_ApplyRuntimeOptions();
+	}
+
 	M68000_UnsetSpecial(SPCFLAG_BRK);
 
 	if (has_cpu_config_changed)
