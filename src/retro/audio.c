@@ -13,7 +13,9 @@ const char Audio_fileid[] = "Hatari audio.c";
 #include "main.h"
 #include "audio.h"
 #include "configuration.h"
+#include "floppy_sound.h"
 #include "log.h"
+#include "main_retro.h"
 #include "sound.h"
 #include "dmaSnd.h"
 #include "crossbar.h"
@@ -76,20 +78,40 @@ void Audio_Lock(void)
  */
 void Audio_Unlock(void)
 {
-	if (bPlayingBuffer && nGeneratedSamples && audio_sample_batch_cb)
+	if (bPlayingBuffer && nGeneratedSamples)
 	{
+		floppy_sound_update_leds(Statusbar_RetroFloppyLedA() ? 1 : 0,
+		                         Statusbar_RetroFloppyLedB() ? 1 : 0);
+
 		if (AudioMixBuffer_pos_read + nGeneratedSamples <= AUDIOMIXBUFFER_SIZE)
 		{
-			audio_sample_batch_cb(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
-			                      nGeneratedSamples);
+			floppy_sound_mix(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
+			                 nGeneratedSamples);
 		}
 		else
 		{
 			int samples_at_end = AUDIOMIXBUFFER_SIZE - AudioMixBuffer_pos_read;
-			audio_sample_batch_cb(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
-			                      samples_at_end);
-			audio_sample_batch_cb(&AudioMixBuffer[0][0],
-			                      (nGeneratedSamples - samples_at_end));
+			floppy_sound_mix(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
+			                 samples_at_end);
+			floppy_sound_mix(&AudioMixBuffer[0][0],
+			                 (nGeneratedSamples - samples_at_end));
+		}
+
+		if (audio_sample_batch_cb)
+		{
+			if (AudioMixBuffer_pos_read + nGeneratedSamples <= AUDIOMIXBUFFER_SIZE)
+			{
+				audio_sample_batch_cb(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
+				                      nGeneratedSamples);
+			}
+			else
+			{
+				int samples_at_end = AUDIOMIXBUFFER_SIZE - AudioMixBuffer_pos_read;
+				audio_sample_batch_cb(&AudioMixBuffer[AudioMixBuffer_pos_read][0],
+				                      samples_at_end);
+				audio_sample_batch_cb(&AudioMixBuffer[0][0],
+				                      (nGeneratedSamples - samples_at_end));
+			}
 		}
 	}
 

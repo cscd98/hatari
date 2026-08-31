@@ -41,9 +41,17 @@ const char Screen_fileid[] = "Hatari screen.c";
 # define DEBUGPRINT(x)
 #endif
 
+#define LED_COLOR 0x00FFC800u /* warm amber, XRGB8888 */
+#define LED_W 6               /* half-width  -> full bar = 13px */
+#define LED_H 3               /* half-height -> full bar =  7px */
+#define LED_CY 10             /* just below any onscreen OSD text */
+#define LED_SPACING 18
+
 /* extern for shortcuts etc. */
 bool bGrabMouse = false;      /* Grab the mouse cursor in the window */
 bool bInFullScreen = false;   /* true if in full screen */
+
+bool retro_led_status_display = true;
 
 static uint32_t *framebuffer;
 static int screen_width, screen_height;
@@ -235,15 +243,65 @@ void Screen_UnLock(void)
 
 
 /**
+ * Draw a small amber block per active floppy drive near the top-right
+ * corner of the framebuffer
+ */
+static void Screen_DrawFloppyLeds(void)
+{
+	int x, y, cx;
+
+	if (!framebuffer || screen_width <= 0 || screen_height <= 0)
+		return;
+
+	if (Statusbar_RetroFloppyLedA())
+	{
+		cx = screen_width - 12;
+		for (y = LED_CY - LED_H; y <= LED_CY + LED_H; y++)
+			for (x = cx - LED_W; x <= cx + LED_W; x++)
+				if (x >= 0 && x < screen_width && y >= 0 && y < screen_height)
+					framebuffer[y * screen_width + x] = LED_COLOR;
+	}
+
+	if (Statusbar_RetroFloppyLedB())
+	{
+		cx = screen_width - 12 - LED_SPACING;
+		for (y = LED_CY - LED_H; y <= LED_CY + LED_H; y++)
+			for (x = cx - LED_W; x <= cx + LED_W; x++)
+				if (x >= 0 && x < screen_width && y >= 0 && y < screen_height)
+					framebuffer[y * screen_width + x] = LED_COLOR;
+	}
+
+	#undef LED_COLOR
+	#undef LED_W
+	#undef LED_H
+	#undef LED_CY
+	#undef LED_SPACING
+}
+
+
+/**
  * Draw ST screen to window/full-screen
  * @param  bForceFlip  Force screen update, even if contents did not change
  */
 bool Screen_Draw(bool bForceFlip)
 {
 	bool screen_changed;
+	static bool prev_led_state = false;
 
 	/* And draw (if screen contents changed) */
 	screen_changed = ConvST_DrawFrame();
+
+	if (retro_led_status_display)
+	{
+		bool led_state = Statusbar_RetroFloppyLedA() || Statusbar_RetroFloppyLedB();
+
+		/* force a refresh on LED state transitions */
+		if (led_state != prev_led_state)
+			screen_changed = true;
+		prev_led_state = led_state;
+
+		Screen_DrawFloppyLeds();
+	}
 
 	if (screen_changed)
 	{
@@ -257,6 +315,9 @@ bool Screen_Draw(bool bForceFlip)
 
 void Screen_GenConvUpdate(bool update_statusbar)
 {
+	if (retro_led_status_display)
+		Screen_DrawFloppyLeds();
+
 	video_refresh_cb(framebuffer, screen_width, screen_height,
 	                 screen_width * 4);
 }

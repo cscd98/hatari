@@ -9,6 +9,7 @@
 
 #include "configuration.h"
 #include "fdc.h"
+#include "floppy_sound.h"
 #include "main_retro.h"
 #include "options.h"
 #include "reset.h"
@@ -405,6 +406,39 @@ static struct retro_core_option_v2_definition option_defs_us[] = {
       },
       "2"
    },
+   {
+      "hatari_floppy_sound",
+      "Floppy Drive Sound",
+      "Floppy Drive Sound",
+      "Play a mechanical click/seek sound whenever a floppy drive is accessed. "
+      "Place a floppy.raw file (16-bit PCM, 44100Hz, stereo, no header) in the "
+      "RetroArch system directory for a custom sound; otherwise a built-in "
+      "synthetic click is used.",
+      NULL,
+      "floppy",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL },
+      },
+      "enabled"
+   },
+   {
+      "hatari_floppy_sound_volume",
+      "Floppy Drive Sound Volume",
+      "Floppy Drive Sound Volume",
+      "Volume of the floppy drive click sound effect.",
+      NULL,
+      "floppy",
+      {
+         { "25",  "25%" },
+         { "50",  "50%" },
+         { "75",  "75%" },
+         { "100", "100%" },
+         { NULL, NULL },
+      },
+      "75"
+   },
 
    /* ---------------- Atari Screen ---------------- */
    {
@@ -480,6 +514,21 @@ static struct retro_core_option_v2_definition option_defs_us[] = {
       "Aspect Ratio Correction (TT/Falcon)",
       "Aspect Ratio Correction (TT/Falcon)",
       "Correct the monitor aspect ratio for TT/Falcon video modes.",
+      NULL,
+      "screen",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL },
+      },
+      "enabled"
+   },
+   {
+      "hatari_led_status_display",
+      "Floppy Activity LED Overlay",
+      "Floppy Activity LED Overlay",
+      "Show a small amber LED near the top-right corner of the screen while "
+      "a floppy drive is being accessed, similar to a real STFM.",
       NULL,
       "screen",
       {
@@ -804,6 +853,9 @@ void Core_ApplyRuntimeOptions(void)
 	ConfigureParams.DiskImage.bAutoInsertDiskB = Core_VarBool("hatari_auto_insert_disk_b", true);
 	ConfigureParams.DiskImage.FastFloppy = Core_VarBool("hatari_fast_floppy", false);
  
+   floppy_sound_set_enabled(Core_VarBool("hatari_floppy_sound", true));
+	floppy_sound_set_volume(Core_VarInt("hatari_floppy_sound_volume", 75) * 256 / 100);
+
 	str = Core_VarStr("hatari_floppy_write_protection", "off");
 	if (!strcmp(str, "off"))
 		ConfigureParams.DiskImage.nWriteProtection = WRITEPROT_OFF;
@@ -836,6 +888,7 @@ void Core_ApplyRuntimeOptions(void)
 	ConfigureParams.Screen.bAllowOverscan = Core_VarBool("hatari_borders", false);
 	ConfigureParams.Screen.nSpec512Threshold = Core_VarInt("hatari_spec512_threshold", 1);
 	ConfigureParams.Screen.bAspectCorrect = Core_VarBool("hatari_aspect_correct", true);
+   retro_led_status_display = Core_VarBool("hatari_led_status_display", true);
  
 	str = Core_VarStr("hatari_video_timing", "ws3");
 	{

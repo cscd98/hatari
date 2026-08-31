@@ -21,3 +21,6 @@ extern retro_video_refresh_t video_refresh_cb;
 extern retro_input_state_t input_state_cb;
 extern void Core_RefreshRateChanged(void);
 extern void Retro_Log(int nType, const char *msg);
+extern bool Statusbar_RetroFloppyLedA(void);
+extern bool Statusbar_RetroFloppyLedB(void);
+extern bool retro_led_status_display;

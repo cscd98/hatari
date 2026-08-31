@@ -25,6 +25,9 @@ const char Statusbar_fileid[] = "Hatari statusbar.c";
 #include "lilo.h"
 
 
+static bool bRetroFloppyLedA = false;
+static bool bRetroFloppyLedB = false;
+
 /**
  * Return statusbar height for given width and height
  */
@@ -68,8 +71,22 @@ void Statusbar_EnableHDLed(drive_led_t state)
 void Statusbar_SetFloppyLed(drive_index_t drive, drive_led_t state)
 {
 	assert(drive == DRIVE_LED_A || drive == DRIVE_LED_B);
+
+  if (drive == DRIVE_LED_A)
+	  bRetroFloppyLedA = (state != LED_STATE_OFF);
+	else
+		bRetroFloppyLedB = (state != LED_STATE_OFF);
 }
 
+bool Statusbar_RetroFloppyLedA(void)
+{
+	return bRetroFloppyLedA;
+}
+
+bool Statusbar_RetroFloppyLedB(void)
+{
+	return bRetroFloppyLedB;
+}
 
 /**
  * Set TOS etc information and initial help message

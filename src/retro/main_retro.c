@@ -13,6 +13,7 @@
 #include "disk_control.h"
 #include "file.h"
 #include "floppy.h"
+#include "floppy_sound.h"
 #include "harddisk.h"
 #include "memorySnapShot.h"
 #include "m68000.h"
@@ -148,6 +149,8 @@ RETRO_API void retro_init(void)
 	{
 		retro_system_directory = system_dir;
 
+		floppy_sound_init(retro_system_directory);
+
 		snprintf(tos_path, sizeof(tos_path), "%s%s%s",
 		         system_dir, RETRO_PATH_SEPARATOR, "tos.img");
 
@@ -161,6 +164,8 @@ RETRO_API void retro_init(void)
 		return;
 	}
 
+	floppy_sound_init(NULL);
+
 	argv[0] = name;
 	argv[1] = NULL;
 	Main_Init(1, (char **)argv);
@@ -173,6 +178,7 @@ RETRO_API void retro_init(void)
 RETRO_API void retro_deinit(void)
 {
 	scratch_path[0] = '\0';
+	floppy_sound_free();
 	Main_UnInit();
 }
 
