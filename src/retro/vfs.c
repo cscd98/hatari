@@ -223,6 +223,9 @@ bool VFS_FileExists(const char *path)
 {
 	if (VFS_IsActive() && vfs_iface->stat_64)
 	{
+//#if 0
+	Log_Printf(LOG_ERROR, "File_Read: VFS_FileExists: path: %s\n", path);
+//#endif
 		int64_t size = 0;
 		int flags = vfs_iface->stat_64(path, &size);
 		return (flags & RETRO_VFS_STAT_IS_VALID) && !(flags & RETRO_VFS_STAT_IS_DIRECTORY);

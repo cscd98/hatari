@@ -188,6 +188,9 @@ RETRO_API void retro_init(void)
 		else
 			Retro_LogFrontend("System BIOS (tos.img) is missing from your system folder.", RETRO_LOG_ERROR);
 
+//#if 0
+		Log_Printf(LOG_WARN, "retro_init: tos_path %s.\n", tos_path);
+//#endif
 		argv[0] = name;
 		argv[1] = tos_arg;
 		argv[2] = tos_path;

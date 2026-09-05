@@ -1935,9 +1935,15 @@ bool Opt_ParseParameters(int argc, const char * const argv[], int *exitval)
 			break;
 
 		case OPT_TOS:
+//#if 0
+	Log_Printf(LOG_ERROR, "Opt_ParseParameters: ConfigureParams.Rom.szTosImageFileName: %s\n", ConfigureParams.Rom.szTosImageFileName);
+//#endif
 			ok = Opt_StrCpy(OPT_TOS, CHECK_FILE, ConfigureParams.Rom.szTosImageFileName,
 					arg, sizeof(ConfigureParams.Rom.szTosImageFileName),
 					&bUseTos);
+//#if 0
+	Log_Printf(LOG_ERROR, "Opt_ParseParameters: AFTER: ConfigureParams.Rom.szTosImageFileName: %s\n", ConfigureParams.Rom.szTosImageFileName);
+//#endif
 			if (ok || !bUseTos)
 			{
 				bLoadAutoSave = false;

@@ -41,6 +41,8 @@ const char File_fileid[] = "Hatari file.c";
 #include "retro/vfs.h"
 #endif
 
+#include "log.h"
+
 /*-----------------------------------------------------------------------*/
 /**
  * Remove any '/'s from end of filenames, but keeps / intact
@@ -241,6 +243,10 @@ uint8_t *File_ReadAsIs(const char *pszFileName, long *pFileSize)
 	uint8_t *pFile = NULL;
 	long FileSize = 0;
 
+//#if 0
+	Log_Printf(LOG_ERROR, "File_ReadAsIs: pszFileName: %s\n", pszFileName);
+//#endif
+
 #ifdef LIBRETRO
 	VFS_FILE hVfsFile;
 
@@ -304,11 +310,19 @@ uint8_t *File_Read(const char *pszFileName, long *pFileSize, const char * const 
 	/* Does the file exist? If not, see if can scan for other extensions and try these */
 	if (!File_Exists(pszFileName) && ppszExts)
 	{
+//#if 0
+	Log_Printf(LOG_ERROR, "File_Read:pszFileName: %s\n", pszFileName);
+//#endif
 		/* Try other extensions, if succeeds, returns correct one */
 		filepath = File_FindPossibleExtFileName(pszFileName, ppszExts);
 	}
 	if (!filepath)
+	{
+//#if 0
+	Log_Printf(LOG_ERROR, "File_Read: no filepath: pszFileName: %s\n", pszFileName);
+//#endif
 		filepath = strdup(pszFileName);
+	}
 
 #if HAVE_LIBZ
 	/* Is it a gzipped file? */
@@ -326,6 +340,9 @@ uint8_t *File_Read(const char *pszFileName, long *pFileSize, const char * const 
 	else
 #endif  /* HAVE_LIBZ */
 	{
+//#if 0
+	Log_Printf(LOG_ERROR, "File_Read: File_ReadAsIs: pszFileName: %s\n", pszFileName);
+//#endif
 		/* It is a normal file */
 		pFile = File_ReadAsIs(filepath, &FileSize);
 	}
@@ -675,12 +692,21 @@ int File_MakePathBuf(char *buf, size_t buflen, const char *pDir,
 	char *tmp;
 
 	if (!buflen)
+	{
+//#if 0
+	Log_Printf(LOG_ERROR, "File_MakePathBuf: EINVAL\n");
+//#endif
 		return -EINVAL;
+	}
 
 	tmp = File_MakePath(pDir, pName, pExt);
 	if (!tmp)
 	{
 		buf[0] = '\0';
+//#if 0
+	Log_Printf(LOG_ERROR, "File_MakePathBuf: ENOMEM\n");
+//#endif
+
 		return -ENOMEM;
 	}
 
@@ -689,6 +715,9 @@ int File_MakePathBuf(char *buf, size_t buflen, const char *pDir,
 	if (buf[buflen - 1])
 	{
 		buf[buflen - 1] = '\0';
+//#if 0
+	Log_Printf(LOG_ERROR, "File_MakePathBuf: E2BIG\n");
+//#endif
 		return -E2BIG;
 	}
 

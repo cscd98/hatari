@@ -806,10 +806,21 @@ void Configuration_SetDefault(void)
 	ConfigureParams.Sound.SdlAudioBufferSize = 0;
 	ConfigureParams.Sound.YmVolumeMixing = YM_TABLE_MIXING;
 
+//#if 0
+	Log_Printf(LOG_WARN, "Configuration_SetDefault: szTosImageFileName:%s Paths_GetDataDir(): %s\n",
+		ConfigureParams.Rom.szTosImageFileName, Paths_GetDataDir());
+//#endif
+
 	/* Set defaults for Rom */
 	File_MakePathBuf(ConfigureParams.Rom.szTosImageFileName,
 	                 sizeof(ConfigureParams.Rom.szTosImageFileName),
 	                 Paths_GetDataDir(), "tos", "img");
+
+//#if 0
+	Log_Printf(LOG_WARN, "Configuration_SetDefault: AFTER: szTosImageFileName %s. Paths_GetDataDir(): %s\n",
+		ConfigureParams.Rom.szTosImageFileName, Paths_GetDataDir());
+//#endif
+
 	ConfigureParams.Rom.bPatchTos = true;
 	strcpy(ConfigureParams.Rom.szCartridgeImageFileName, "");
 
@@ -966,8 +977,14 @@ void Configuration_Apply(bool bReset)
 		}
 	}
 
+//#if 0
+	Log_Printf(LOG_ERROR, "Configuration_Apply: ConfigureParams.Rom.szTosImageFileName: %s\n", ConfigureParams.Rom.szTosImageFileName);
+//#endif
 	/* Clean file and directory names */
 	File_MakeAbsoluteName(ConfigureParams.Rom.szTosImageFileName);
+//#if 0
+	Log_Printf(LOG_ERROR, "Configuration_Apply: AFTER: ConfigureParams.Rom.szTosImageFileName: %s\n", ConfigureParams.Rom.szTosImageFileName);
+//#endif
 	if (strlen(ConfigureParams.Rom.szCartridgeImageFileName) > 0)
 		File_MakeAbsoluteName(ConfigureParams.Rom.szCartridgeImageFileName);
 	if (strlen(ConfigureParams.Lilo.szKernelFileName) > 0)
