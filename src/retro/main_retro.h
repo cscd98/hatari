@@ -7,12 +7,6 @@
 
 #include "libretro.h"
 
-#ifdef _WIN32
-#define RETRO_PATH_SEPARATOR   		"\\"
-#else
-#define RETRO_PATH_SEPARATOR   		"/"
-#endif
-
 extern bool has_cpu_config_changed;
 extern const char *retro_system_directory;
 extern const char *retro_save_directory;

@@ -107,7 +107,7 @@ void HardDisk_SetGemdosDrive(const char *path)
 		char boot_path[FILENAME_MAX];
 
 		snprintf(boot_path, sizeof(boot_path), "%s%shatari%sBOOT.ST",
-		         retro_system_directory, RETRO_PATH_SEPARATOR, RETRO_PATH_SEPARATOR);
+		         retro_system_directory, PATHSEP, PATHSEP);
 
 		if (File_Exists(boot_path))
 		{

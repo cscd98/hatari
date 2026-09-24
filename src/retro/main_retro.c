@@ -181,7 +181,7 @@ RETRO_API void retro_init(void)
 		retro_system_directory = system_dir;
 
 		snprintf(tos_path, sizeof(tos_path), "%s%s%s",
-		         system_dir, RETRO_PATH_SEPARATOR, "tos.img");
+		         system_dir, PATHSEP, "tos.img");
 
 		if(File_Exists(tos_path))
 			have_bios = true;
@@ -295,7 +295,7 @@ static const char *Serialize_ScratchPath(void)
 	{
 		if (retro_system_directory && retro_system_directory[0])
 			snprintf(scratch_path, sizeof(scratch_path), "%s%s%s",
-			         retro_system_directory, RETRO_PATH_SEPARATOR, SAVESTATE_TMP_NAME);
+			         retro_system_directory, PATHSEP, SAVESTATE_TMP_NAME);
 		else
 			snprintf(scratch_path, sizeof(scratch_path), "%s", SAVESTATE_TMP_NAME);
 	}
