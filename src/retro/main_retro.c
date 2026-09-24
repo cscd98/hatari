@@ -164,6 +164,8 @@ RETRO_API void retro_init(void)
 	const char *system_dir = NULL;
 	struct retro_log_callback logging;
 
+	argv[0] = name;
+
 	/* Register log call back */
 	if (environment_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
 		log_cb = logging.log;
@@ -188,7 +190,6 @@ RETRO_API void retro_init(void)
 		else
 			Retro_LogFrontend("System BIOS (tos.img) is missing from your system folder.", RETRO_LOG_ERROR);
 
-		argv[0] = name;
 		argv[1] = tos_arg;
 		argv[2] = tos_path;
 		argv[3] = NULL;
@@ -197,7 +198,6 @@ RETRO_API void retro_init(void)
 	}
 	else
 	{
-		argv[0] = name;
 		argv[1] = NULL;
 		Main_Init(1, (char **)argv);
 	}
